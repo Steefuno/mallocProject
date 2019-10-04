@@ -1,7 +1,7 @@
-all: memgrind.c myalloc.o 
+all: memgrind.c mymalloc.o 
 	gcc memgrind.c mymalloc.o
 
-myalloc.o: myalloc.c
+mymalloc.o: mymalloc.c
 	gcc -c mymalloc.c
 
 clean:
