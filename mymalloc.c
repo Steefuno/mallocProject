@@ -2,9 +2,10 @@
 #include <stdlib.h>
 
 char data[4096]; //Initialize the data
+//Setup Node0 here
 
 /* Malloc function
- * Scans starting from Node0
+ * Scans starting from 0
  * 	if size >= bytes (if current node is big enough)
  * 		if used == 0 (if current node is open)
  * 			set used to bytes
@@ -29,7 +30,21 @@ void* mymalloc(int bytes, int line, char* fileName) {
 }
 
 /* Free function
- * 
+ * backtrack from ptr to get metadata of node to be freed, Node1
+ * Scan starting from 0
+ * 	if next node's index is the outside of the given memory
+ * 		error: User is trying to free a node that doesnt exist
+ * 	if next node's index is Node1's, save current position as Node0
+ * 	if next node's index is after Node1's
+ * 		error: User is trying to free a node that doesnt exist
+ * get node after Node1, Node2, if it is not the end of memory
+ *
+ * set currentNode to Node1
+ * if Node2 exists and has used=0 (erase node2 and merge into node1)
+ * 	set Node1.size to Node1.size + metadataSize(of Node2) + Node2.Size
+ * if Node0 has used=0 (erase node1 and merge into node0)
+ * 	set currentNode to Node0
+ * 	set Node0.size to Node0.size + metadataSize(of Node1) + Node1.Size
  */
 void free(void* ptr, int line, char* fileName) {
 	
