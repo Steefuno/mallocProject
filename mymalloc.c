@@ -1,7 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char data[4096]; //Initialize the data
+static char myblock[4096]; //Initialize the data
+
+struct node
+{
+struct node* next;
+struct node* prev;
+//# of bytles until next node/end of memory
+int size;
+//# of bytes allocated with malloc
+int used;
+
+};
 //Setup Node0 here
 
 /* Malloc function
@@ -25,7 +36,23 @@ char data[4096]; //Initialize the data
  * 		else (if no more nodes)
  * 			return NULL
  */
-void* mymalloc(int bytes, int line, char* fileName) {
+void* mymalloc(size_t bytes, char* fileName, int line) {
+
+	//Malloc of 0 bytes should result in NULL
+	//Can return null since it is a void pointer
+
+	if (bytes == 0)
+		{
+		return NULL; 	
+		}
+
+	if (bytes < 0 )
+		{
+		//ERROR Do stuff
+		
+		}
+
+	
 	
 }
 
@@ -46,6 +73,6 @@ void* mymalloc(int bytes, int line, char* fileName) {
  * 	set currentNode to Node0
  * 	set Node0.size to Node0.size + metadataSize(of Node1) + Node1.Size
  */
-void free(void* ptr, int line, char* fileName) {
+void free(void* ptr, char* fileName, int line) {
 	
 }
