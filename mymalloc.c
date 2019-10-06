@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "mymalloc.h"
 static char myblock[4096]; //Initialize the data
 
 struct node
 {
-struct node* next;
-struct node* prev;
 //# of bytles until next node/end of memory
-int size;
+unsigned short int size;
 //# of bytes allocated with malloc
-int used;
+unsigned short int used;
 
 };
 //Setup Node0 here
@@ -36,10 +34,17 @@ int used;
  * 		else (if no more nodes)
  * 			return NULL
  */
+
+
+ 
 void* mymalloc(size_t bytes, char* fileName, int line) {
 
 	//Malloc of 0 bytes should result in NULL
 	//Can return null since it is a void pointer
+	
+	//need a way to see if it is the first time called
+	//not sure if this works, check later	 
+	static int called = 0; 	
 
 	if (bytes == 0)
 		{
@@ -51,6 +56,16 @@ void* mymalloc(size_t bytes, char* fileName, int line) {
 		//ERROR Do stuff
 		
 		}
+//	static struct node *first;
+	static struct node *first;	
+	//if first time called
+	if (called == 0){
+		
+		//create the first node at the start of the memory
+		first = (struct node*) myblock;
+		first->size = 4096;
+		printf("size aka: %d", first->size);			
+	}
 
 	
 	
@@ -73,6 +88,5 @@ void* mymalloc(size_t bytes, char* fileName, int line) {
  * 	set currentNode to Node0
  * 	set Node0.size to Node0.size + metadataSize(of Node1) + Node1.Size
  */
-void free(void* ptr, char* fileName, int line) {
-	
+void myfree(void* ptr, char* fileName, int line) {	
 }
