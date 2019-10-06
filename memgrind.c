@@ -3,9 +3,14 @@
 #include <string.h>
 #include <time.h> 
 #include <math.h>
+#include <sys/time.h>
 #include "mymalloc.h"
 
-void firstWorkload(){
+long firstWorkload(){
+
+struct timeval start, end;
+
+gettimeofday(&start, 0);
 
 int i;
 void* arr[4096];
@@ -14,10 +19,18 @@ for(i = 0; i<150; i++)
 	arr[i] = malloc(1);
 	free(arr[i]); 
 	}
+gettimeofday(&end, 0);
 
+long elapsed = (end.tv_sec - start.tv_sec)*1000000 + end.tv_usec - start.tv_usec;
+
+return elapsed; 
 }
 
-void secondWorkload(){
+long secondWorkload(){
+
+struct timeval start, end; 
+
+gettimeofday(&start, 0);
 
 int i;
 int j= 0;
@@ -39,7 +52,11 @@ for(i = 0; i<150; i++){
 	j++;
 } 
 
+gettimeofday(&end, 0);
 
+long elapsed = (end.tv_sec - start.tv_sec)*1000000 + end.tv_usec - start.tv_usec;
+
+return elapsed; 
 
 } 
 
@@ -51,7 +68,7 @@ void thirdWorkload(){}
 int main() {
 //perform all workloads
 
-//A 
+//have to run all workloads 100 times and find the average times 
 
 firstWorkload();
 
