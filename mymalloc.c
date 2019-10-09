@@ -4,7 +4,7 @@
 static char myblock[4096]; //Initialize the data
 
 //Format for metadata before each allocated data in myblock
-typedef struct _metadata
+typedef struct metadata
 {
 	//# of bytles until next node/end of memory
 	unsigned short int size;
@@ -13,7 +13,11 @@ typedef struct _metadata
 } metadata;
 
 //Setup node0
-metadata* node0 = &(myblock[0]);
+
+//previously was this 
+//metadata* node0 =  &(myblock[0]);
+ metadata* node0 =(metadata*) &myblock[0]; 
+
 node0->used = 0;
 node0->size = 4096 - sizeof(metadata);
 
