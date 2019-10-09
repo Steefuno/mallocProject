@@ -46,17 +46,34 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 		printf("\tReturning NULL, allocated 0 bytes\n");
 		return NULL; 	
 	}
+	//Allocating a value greater than max size also stops cases when size_t is smaller then casting
+	if (bytes > (size_t)(4096 - sizeof(metadata)))
+	{
+		printf("\tReturn NULL, no space\n");
+		return NULL;
+	}
 	//Note: size_t is an unsigned decimal, cannot be negative
 	
 	metadata* currentNode = node0;
-	while (/*temp, replace with something else later*/ true)
+	while (true)
 	{
-		if (currentNode->size >= bytes)
+		if (currentNode->size >= (unsigned short)bytes)
 		{
 			//Current node has enough space to allocate
 			if (currentNode->used == 0) 
 			{
 				currentNode->used = (unsigned short)bytes;
+				
+				printf("\tReturning %x, allocated %d into empty node\n",
+					(void*)currentNode + sizeof(metadata),
+					(unsigned short)bytes
+				);
+				return (void*)currentNode + sizeof(metadata);
+			}
+
+			//Current node is used, but still has enough space
+			if (currentNode->size - currentNode->used >= (unsigned short)bytes + sizeof(metadata)) {
+
 			}
 		} else {
 			//Current node is too small, continue to next node
