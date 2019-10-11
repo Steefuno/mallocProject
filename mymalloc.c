@@ -38,7 +38,8 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 {
 	//Setup Node0 if NULL
 	if (node0 == NULL)
-	{
+	{	
+		//setup of metadata
 		printf("node0 is NULL, setting up\n");
 		node0 = (metadata*)myblock;
 		node0->used = 0;
@@ -49,13 +50,15 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 	printf("Attempting to allocate %zu bytes\n", bytes);
 	if (bytes == 0) //allocating 0 bytes, return NULL
 	{
-		printf("\tReturning NULL, allocated 0 bytes\n");
+		printf("\tReturning NULL, allocated 0 bytes\n"
+		"\tFile: %s, Line:%d" , fileName, line);
 		return NULL; 	
 	}
 	//Allocating a value greater than max size also stops cases when size_t is smaller then casting
 	if (bytes > (size_t)(4096 - sizeof(metadata)))
 	{
-		printf("\tReturn NULL, no space\n");
+		printf("\tReturn NULL, no space\n"
+		"\tFile: %s, Line:%d" , fileName, line);
 		return NULL;
 	}
 	//Note: size_t is an unsigned decimal, cannot be negative
@@ -63,10 +66,12 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 	metadata* currentNode = node0;
 	printf("\tStarting allocate from %x\n", currentNode);
 	while (1)
-	{
+	{	//make sure size of currentNode is greater than or equal to how much is being allocated
 		if (currentNode->size >= (unsigned short)bytes)
 		{
 			//Current node has enough space to allocate
+			//when will this not be 0? 
+				//when it is not the first time allocating 
 			if (currentNode->used == 0) 
 			{
 				currentNode->used = (unsigned short)bytes;
@@ -101,14 +106,16 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 			}
 			printf("\tFull: ");
 		} else {
-			printf("\tToo Small: ");
+			printf("\tToo Small: "
+			"\tFile: %s, Line:%d" , fileName, line);
 		}
 		//Current node is too small or big enough, but too full, continue to next node
 
 		//Next node cannot exist, no space
 		if ((void*)currentNode + currentNode->size > (void*)myblock + 4096 - (unsigned short)bytes - sizeof(metadata))
 		{
-			printf("\tReturning NULL, no more space\n");
+			printf("\tReturning NULL, no more space\n"
+			"\tFile: %s, Line:%d" , fileName, line);
 			return NULL;
 		}
 
@@ -142,4 +149,22 @@ void* mymalloc(size_t bytes, char* fileName, int line)
  */
 void myfree(void* ptr, char* fileName, int line) {
 	
+	if(ptr == NULL ) {
+	//error print something
+	return; 
+	}
+
+	
+	
+	//metadata of node to be freed 
+	metadata* nodeOne = (metadata*)ptr - sizeof(metadata);
+
+	//change this
+	printf("number bytes being freed are %d\n",nodeOne->used);
+
+		
+	
+
+
+
 }
