@@ -43,6 +43,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 		node0 = (metadata*)myblock;
 		node0->used = 0;
 		node0->size = 4096 - sizeof(metadata);
+		printf("Data starts at %x and ends at %x\n", node0, (void*)node0 + 4096 - sizeof(metadata));
 	}
 
 	printf("Attempting to allocate %zu bytes\n", bytes);
@@ -70,7 +71,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 			{
 				currentNode->used = (unsigned short)bytes;
 				
-				printf("\t%x is an empty node, allocating space\n",
+				printf("\t%x is an empty node, allocating %d bytes\n",
 					(void*)currentNode + sizeof(metadata),
 					(unsigned short)bytes
 				);
@@ -88,27 +89,32 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 				((metadata*)newNode)->size = size;
 				((metadata*)newNode)->used = used;
 
-				printf("\t%x is used, but has enough space, so created new node at %x\n",
+				printf("\t%x is used, but has enough space, so created new node at %x with %d\n",
 					currentNode,
-					newNode);
+					newNode,
+					used
+				);
 
 				//Resize currnetNode to 
 				currentNode->size = currentNode->used;
 				return (void*)newNode + sizeof(metadata); //return pointer to data for newNode
 			}
+			printf("\tFull: ");
+		} else {
+			printf("\tToo Small: ");
 		}
 		//Current node is too small or big enough, but too full, continue to next node
 
 		//Next node cannot exist, no space
-		if ((void*)currentNode == (void*)myblock + 4096)
+		if ((void*)currentNode + currentNode->size > (void*)myblock + 4096 - (unsigned short)bytes - sizeof(metadata))
 		{
 			printf("\tReturning NULL, no more space\n");
 			return NULL;
 		}
 
 		//Change current to next node
-		printf("\t%x is unavailable, continuing to ", currentNode);
-		currentNode = (metadata*)((void*)currentNode + currentNode->size + sizeof(metadata));
+		printf("%x is unavailable with size %d, continuing to ", currentNode, currentNode->size);
+		currentNode = (metadata*)((void*)currentNode + sizeof(metadata) + currentNode->size);
 		printf("%x\n", currentNode);
 
 		//continue to check next node
