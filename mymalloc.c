@@ -13,11 +13,7 @@ typedef struct metadata
 } metadata;
 
 //Setup node0
-
-//previously was this 
-//metadata* node0 =  &(myblock[0]);
- metadata* node0 =(metadata*) &myblock[0]; 
-
+metadata* node0 =(metadata*) &myblock[0]; 
 node0->used = 0;
 node0->size = 4096 - sizeof(metadata);
 
@@ -59,6 +55,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 	//Note: size_t is an unsigned decimal, cannot be negative
 	
 	metadata* currentNode = node0;
+	printf("\tStarting allocate from %x\n", currentNode);
 	while (true)
 	{
 		if (currentNode->size >= (unsigned short)bytes)
@@ -68,7 +65,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 			{
 				currentNode->used = (unsigned short)bytes;
 				
-				printf("\tReturning %x, allocated %d into empty node\n",
+				printf("\t%x is an empty node, allocating space\n",
 					(void*)currentNode + sizeof(metadata),
 					(unsigned short)bytes
 				);
@@ -76,24 +73,43 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 			}
 
 			//Current node is used, but still has enough space
-			if (currentNode->size - currentNode->used >= (unsigned short)bytes + sizeof(metadata)) {
-
-			}
-		} else {
-			//Current node is too small, continue to next node
-
-			//Next node cannot exist, no space
-			if ((void*)currentNode == (void*)myBlock + 4096)
+			if (currentNode->size - currentNode->used >= (unsigned short)bytes + sizeof(metadata))
 			{
-				printf("\tReturning NULL, no more space\n");
-				return NULL;
-			}
+				unsigned short size = currentNode->size - currentNode->used - sizeof(metadata);
+				unsigned short used = (unsigned short)bytes;
 
-			currentNode = (void*)currentNode + currentNode->size + sizeof(metadata);
-			//continue to check next node
-			continue;
+				//Create newNode right after used data for currentNode
+				void* newNode = (void*)currentNode + sizeof(metadata) + currentNode->used;
+				((metadata*)newNode)->size = size;
+				((metadata*)newNode)->used = used;
+
+				printf("\t%x is used, but has enough space, so created new node at %x\n",
+					currentNode,
+					newNode);
+
+				//Resize currnetNode to 
+				currentNode->size = currentNode->used;
+				return (void*)newNode + sizeof(metadata); //return pointer to data for newNode
+			}
 		}
+		//Current node is too small or big enough, but too full, continue to next node
+
+		//Next node cannot exist, no space
+		if ((void*)currentNode == (void*)myBlock + 4096)
+		{
+			printf("\tReturning NULL, no more space\n");
+			return NULL;
+		}
+
+		//Change current to next node
+		printf("\t%x is unavailable, continuing to ", currentNode);
+		currentNode = (metadata*)((void*)currentNode + currentNode->size + sizeof(metadata));
+		printf("%x\n", currentNode);
+
+		//continue to check next node
 	}
+
+	return NULL; //Never occurs, idk if we need to leave this here
 }
 
 /* Free function
