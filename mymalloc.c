@@ -11,11 +11,7 @@ typedef struct metadata
 	//# of bytes allocated with malloc
 	unsigned short int used;
 } metadata;
-
-//Setup node0
-metadata* node0 =(metadata*) &myblock[0]; 
-node0->used = 0;
-node0->size = 4096 - sizeof(metadata);
+metadata* node0;
 
 /* Malloc function
  * Scans starting from 0
@@ -40,6 +36,15 @@ node0->size = 4096 - sizeof(metadata);
  */
 void* mymalloc(size_t bytes, char* fileName, int line)
 {
+	//Setup Node0 if NULL
+	if (node0 == NULL)
+	{
+		printf("node0 is NULL, setting up\n");
+		node0 = (metadata*)myblock;
+		node0->used = 0;
+		node0->size = 4096 - sizeof(metadata);
+	}
+
 	printf("Attempting to allocate %zu bytes\n", bytes);
 	if (bytes == 0) //allocating 0 bytes, return NULL
 	{
@@ -56,7 +61,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 	
 	metadata* currentNode = node0;
 	printf("\tStarting allocate from %x\n", currentNode);
-	while (true)
+	while (1)
 	{
 		if (currentNode->size >= (unsigned short)bytes)
 		{
@@ -95,7 +100,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 		//Current node is too small or big enough, but too full, continue to next node
 
 		//Next node cannot exist, no space
-		if ((void*)currentNode == (void*)myBlock + 4096)
+		if ((void*)currentNode == (void*)myblock + 4096)
 		{
 			printf("\tReturning NULL, no more space\n");
 			return NULL;
