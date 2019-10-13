@@ -147,24 +147,138 @@ void* mymalloc(size_t bytes, char* fileName, int line)
  * 	set currentNode to Node0
  * 	set Node0.size to Node0.size + metadataSize(of Node1) + Node1.Size
  */
+//Node 1 is before it's being freed
+//Node 2 is the one being freed
+//Node 3 is after the one being freed
+
 void myfree(void* ptr, char* fileName, int line) {
 	
 	if(ptr == NULL ) {
-	//error print something
-	return; 
+		//error print something
+		return; 
+		}
+
+	if(ptr < (void*)node0 + sizeof(metadata) ) {
+		
+		//error print something
+		//invalid pointer??
+		return;
+		}
+	printf("\t IS SOMETHING HAPPENING?? \n"
+					"\tFile: %s, Line:%d" , fileName, line);	
+			
+	//metadata of node to be freed 
+	metadata* node2 = ptr - sizeof(metadata);
+
+	metadata* currentNode = node0;  
+ 	metadata* node1 = currentNode; 
+	metadata* node3; 
+	
+	//change this
+	printf("Number bytes being freed are %d\n",currentNode->used);
+
+
+	/*
+	//check this again (may not be proper error message) 
+	if(currentNode->used == 0) {
+	printf("\terror: User is trying to free something more than once\n"
+					"\tFile: %s, Line:%d" , fileName, line);
+
+	}
+*/ 
+
+
+	//if node0 doesn't exist
+	if(currentNode==NULL){ 
+	
+		printf("error: No data has been allocated");	
+		return;
+	} 
+			
+	
+	printf("\tfree: %d\n",node0->used);
+		
+	//may be beneficial to change this later
+	while(1) {
+		//nodes index is outside of the given memory
+		//IF STATEMENT CHECK THIS 
+		if( (void*)currentNode > (void*)myblock + 4096 ){
+			printf("\terror: User is trying to free a node that doesnt exist\n"
+					"\tFile: %s, Line:%d" , fileName, line);	
+			
+			return; 
+			}
+	
+		//if we came across the  node 
+		if (currentNode == node2) {
+			break;
+
+		// maybe we should set the next node? 
+			}
+		
+		//passed the node2	
+		if (currentNode>node2){
+			printf("\terror: User is trying to free a node that doesnt exist\n"
+					"\tFile: %s, Line:%d" , fileName, line);
+			
+			return;
+			}  	
+
+			
+
+		//lagging node
+		node1=currentNode;		
+	
+		//move onto the next node 
+		currentNode = (void*)currentNode + currentNode->used + sizeof(metadata); 
+		
+		
+		
 	}
 
+	//get node 3 if it exists	
+	if((void*)node2 + sizeof(metadata) + node2->size < (void*)myblock+4096 - sizeof(metadata)) {
+			
+		node3 = (void*)node2 + node2->used + sizeof(metadata); 	
+		//printf("yeee HAW %d ", node3->used); 	
+	} 
 	
-	
-	//metadata of node to be freed 
-	metadata* nodeOne = (metadata*)ptr - sizeof(metadata);
+	//if node3 exists
+	if (node3!=NULL){
+		if(node3->used == 0){
+		//erase node 3 and merge into node 2
 
-	//change this
-	printf("number bytes being freed are %d\n",nodeOne->used);
-
+		//merge
+		node2->size = node2->size + node3->size + sizeof(metadata); 
+		node2->size = node2->used + node3->used + sizeof(metadata);
+		}
 		
+		node3 = NULL;
+	}
 	
-
+	//if our node isn't the first node
+	if (node1!=node2){
+		//printf("gang gang out here");
+		
+		if(node1->used == 0){
+			//erase node2 and merge into node1 
+			
+			//merge
+			node1->size = node1->size + node2->size + sizeof(metadata);	
+			node1->used = node1->used + node2->used + sizeof(metadata); 
+			
+			//erase
+			node2 = NULL;				
+				
+			}
+			 	
+		}
+	
+	else{
+		//node before and after not available
+		node2->used = 0;
+	
+	}
 
 
 }
