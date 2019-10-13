@@ -6,41 +6,46 @@
 #include <sys/time.h>
 #include "mymalloc.h"
 
+
 long firstWorkload(){
 
-struct timeval start, end;
+	struct timeval start, end;
 
-gettimeofday(&start, 0);
+	gettimeofday(&start, 0);
 
-int i;
-void* arr[4096];
-for(i = 0; i<150; i++)
-	{
-	arr[i] = malloc(1);
-	free(arr[i]); 
-	}
-gettimeofday(&end, 0);
+	int i;
+	int *arr[4096];
+	
+		for(i = 0; i<150; i++)
+		{
+			arr[i] = (int *)malloc(1);
+			free(arr[i]); 
+		}
 
-long elapsed = (end.tv_sec - start.tv_sec)*1000000 + end.tv_usec - start.tv_usec;
+		gettimeofday(&end, 0);
 
-return elapsed; 
-}
+		long elapsed = (end.tv_sec - start.tv_sec)*1000000 + end.tv_usec - start.tv_usec;
+
+	return elapsed; 
+		}				
 
 long secondWorkload(){
 
-struct timeval start, end; 
+	struct timeval start, end; 
 
-gettimeofday(&start, 0);
+	gettimeofday(&start, 0);
 
-int i;
-int j= 0;
-void* arr[4096];
-for(i = 0; i<150; i++){
+	int i;
+	int j= 0;
+	void* arr[4096];
+		
+		for(i = 0; i<150; i++){
 
 	
-	arr[j] = malloc(1);
-	if (j == 50)
-	{
+			arr[j] = (void*)malloc(1);
+			if (j == 50)
+			{
+
 	//if 50 is reached, then start to free
 	j = -1;
 	int x;
@@ -64,19 +69,16 @@ void thirdWorkload(){}
 
 
 
-
 int main() {
 //perform all workloads
 
 //have to run all workloads 100 times and find the average times 
 
-firstWorkload();
+//firstWorkload();
+//secondWorkload();
 
 
-secondWorkload();
+
 }
-
-
-
 
 
