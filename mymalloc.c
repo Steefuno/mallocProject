@@ -151,139 +151,84 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 //Node 2 is the one being freed
 //Node 3 is after the one being freed
 
-void myfree(void* ptr, char* fileName, int line) {
-	
-	if(ptr == NULL ) {
-		printf("\terror: Cannot free NULLt\n"
-					"\tFile: %s, Line:%d" , fileName, line);	
-				 
-		return; 
-		}
+void myfree(void* ptr, char* fileName, int line)
+{
+	printf("Attempting to free %x\n", ptr);
 
-	if(ptr < (void*)node0 + sizeof(metadata) ) {
-		
-		printf("\terror: User is trying to free a node that doesnt exist\n"
-					"\tFile: %s, Line:%d" , fileName, line);	
-			
-		//invalid pointer??
+	//User is freeing a node before allocated space
+	if (ptr < (void*)node0 + sizeof(metadata) ) {
+		printf("\terror: %x is not inside memory\n
+			\tFile: %s, Line:%d" , ptr, fileName, line);			
 		return;
-		}
+	}
 		
-
-		//if node0 doesn't exist
-	if(node0==NULL){ 
-		printf("\terror: No data allocated\n"
-					"\tFile: %s, Line:%d" , fileName, line);
-		
+	//Node0 is NULL when malloc is not called yet
+	if (node0==NULL){ 
+		printf("\terror: No data allocated\n
+			\tFile: %s, Line:%d" , fileName, line);
 		return;
 	} 
 
-	
 	//metadata of node to be freed 
-	metadata* node2 = ptr - sizeof(metadata);
-	metadata* currentNode = node0;  
- 	metadata* node1 = currentNode; 
+	metadata* node2 = (metadata*)((void*)ptr - sizeof(metadata));
+	metadata* currentNode = node0;
+ 	metadata* node1; 
 	metadata* node3; 
 	
-	//change this
-	printf("Number bytes being freed are %d\n",currentNode->used);
-
-
-	
-	//check this again (may not be proper error message) 
-	if(currentNode->used == 0) {
-	printf("\terror: User is trying to free something more than once\n"
-					"\tFile: %s, Line:%d" , fileName, line);
-
+	//trying to free an unused node
+	if (currentNode->used == 0) {
+		printf("\terror: Cannot free unallocated space\n
+			\tFile: %s, Line:%d" , fileName, line);
+		return;
 	}
 
-
- 
-				
-	printf("\tfree: %d\n",node0->used);
-		
-	
+	//Find node1
 	while(1) {
-		//nodes index is outside of the given memory
-		//IF STATEMENT CHECK THIS 
-		if( (void*)currentNode > (void*)myblock + 4096 ){
-			printf("\terror: User is trying to free a node that doesnt exist\n"
-					"\tFile: %s, Line:%d" , fileName, line);	
-			
-			return; 
-			}
-	
-		//if we came across the  node 
-		if (currentNode == node2) {
-			break;
+		printf("\tChecking node1 in %x\n", currentNode);
 
-		 
-			}
+		if (currentNode == node2) break; //If node0 is node2
+
+		//checks if node2 is outside of the given memory
+		if ((void*)currentNode + sizeof(metadata) + currentNode->size >= (void*)myblock + 4096 ){
+			printf("\terror: %x is not inside memory\n
+				\tFile: %s, Line:%d" , ptr, fileName, line);	
+			return; 
+		}
+	
+		//if next node is node2, currentNode is node1
+		if ((void*)currentNode + sizeof(metadata) + currentNode->size == node2) {
+			node1 = currentNode;
+			break;
+		}
 		
 		//passed the node2	
-		if (currentNode>node2){
-			printf("\terror: User is trying to free a node that doesnt exist\n"
-					"\tFile: %s, Line:%d" , fileName, line);
-			
+		if ((void*)currentNode + sizeof(metadata) + currentNode-> size > node2) {
+			printf("\terror: Cannot free unallocated space\n
+				\tFile: %s, Line:%d" , fileName, line);	
 			return;
-			}  	
-
-			
-
-		//lagging node
-		node1=currentNode;		
+		}
 	
 		//move onto the next node 
-		currentNode = (void*)currentNode + currentNode->used + sizeof(metadata); 
-		
-		
-		
+		currentNode = (metadata*)((void*)currentNode + sizeof(metadata) + currentNode->size);
 	}
 
-	//get node 3 if it exists	
+	//get node 3 if it exists
 	if((void*)node2 + sizeof(metadata) + node2->size < (void*)myblock+4096 - sizeof(metadata)) {
-			
-		node3 = (void*)node2 + node2->used + sizeof(metadata); 	
- 	
+		node3 = (void*)node2 + sizeof(metadata) + node2->size;
 	} 
 	
-	//if node3 exists
-	if (node3!=NULL){
-		if(node3->used == 0){
-		//erase node 3 and merge into node 2
-
-		//merge
-		node2->size = node2->size + node3->size + sizeof(metadata); 
-		node2->size = node2->used + node3->used + sizeof(metadata);
-		}
-		
-		//erase
-		node3 = NULL;
+	//if node3 is empty, merge into node2
+	if (node3 != NULL && node3->used == 0) {
+		printf("\t\tMerged node3 into node2\n");
+		node2->size = node2->size + sizeof(metadata) + node3->size;
+		//node3 = NULL; don't need to do this because the variable will disappear after function ends
 	}
 	
-	//if our node isn't the first node
-	if (node1!=node2){
-	
-		
-		if(node1->used == 0){
-			//erase node2 and merge into node1 
-			
-			//merge
-			node1->size = node1->size + node2->size + sizeof(metadata);	
-			node1->used = node1->used + node2->used + sizeof(metadata); 
-			
-			//erase
-			node2 = NULL;				
-				
-			}
-			 	
-		}
-	
-	else{
-		//node before and after not available
-		node2->used = 0;
-	
+	//if node1 is empty, merge node2 into node1
+	if (node1 != NULL && node1->used == 0) {
+		printf("\t\tMerged node2 into node1\n");
+		node1->size = node1->size + sizeof(metadata) + node2->size;
 	}
 
-
+	return;
 }
