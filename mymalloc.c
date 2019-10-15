@@ -106,15 +106,14 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 			}
 //			printf("\tFull: ");
 		} else {
-			printf("\tToo Small: "
-			"\tFile: %s, Line:%d" , fileName, line);
+			printf("\t%x is too small, continuing to next node\n", currentNode);
 		}
 		//Current node is too small or big enough, but too full, continue to next node
 
 		//Next node cannot exist, no space
 		if ((void*)currentNode + currentNode->size > (void*)myblock + 4096 - (unsigned short)bytes - sizeof(metadata))
 		{
-			printf("\tReturning NULL, no more space\n"
+			printf("\terror: Returning NULL, no more space\n"
 			"\tFile: %s, Line:%d" , fileName, line);
 			return NULL;
 		}
