@@ -64,7 +64,6 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 	//Note: size_t is an unsigned decimal, cannot be negative
 	
 	metadata* currentNode = node0;
-	printf("\tStarting allocate from %x\n", currentNode);
 	while (1)
 	{	//make sure size of currentNode is greater than or equal to how much is being allocated
 		if (currentNode->size >= (unsigned short)bytes)
@@ -104,9 +103,6 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 				currentNode->size = currentNode->used;
 				return (void*)newNode + sizeof(metadata); //return pointer to data for newNode
 			}
-//			printf("\tFull: ");
-		} else {
-			printf("\t%x is too small, continuing to next node\n", currentNode);
 		}
 		//Current node is too small or big enough, but too full, continue to next node
 
@@ -176,10 +172,7 @@ void myfree(void* ptr, char* fileName, int line)
 	
 	//Find node1
 	while(1) {
-		printf("\tChecking node1 in %x\n", currentNode);
-
 		if (currentNode == node2){
-			printf("\t\tNode2 is Node0\n");
 			break; //If node0 is node2
 		}
 		
@@ -194,7 +187,6 @@ void myfree(void* ptr, char* fileName, int line)
 
 		//if next node is node2, currentNode is node1
 		if ((void*)currentNode + sizeof(metadata) + currentNode->size == node2) {
-			printf("\t\tNode1 is %x\n", currentNode);
 			node1 = currentNode;
 			break;
 		}
@@ -214,7 +206,6 @@ void myfree(void* ptr, char* fileName, int line)
 	//get node 3 if it exists
 	if((void*)node2 + sizeof(metadata) + node2->size < (void*)myblock + 4096 - sizeof(metadata)) {
 		node3 = (void*)node2 + sizeof(metadata) + node2->size;
-		printf("\t\tNode3 is %x\n", node3);
 	}
 	
 	//if node3 is empty, merge into node2

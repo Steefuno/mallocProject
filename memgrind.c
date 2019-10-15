@@ -122,11 +122,37 @@ double fourthWorkload()
 
 	gettimeofday(&end, 0);
 	double elapsed = (double)(end.tv_usec - start.tv_usec)/1000000 + (double)(end.tv_sec - start.tv_sec);
+	return elapsed;
 }
 
 double fifthWorkload()
 {
-	return 1;
+	printf("\nWORKLOAD5\n");
+	
+	struct timeval start, end;
+	gettimeofday(&start, 0);
+
+	int i;
+	char * data[150];
+	for (i=0; i < 150; i++) {
+		data[i] = (char*)malloc(1);
+	}
+	for (i=0; i < 150; i = i + 4) { //Free normally
+		free(data[i]);
+	}
+	for (i=1; i < 150; i = i + 4) { //Test merging down
+		free(data[i]);
+	}
+	for (i=3; i < 150; i = i + 4) { //Test merging up
+		free(data[i]);
+	}
+	for (i=2; i < 150; i = i + 4) { //Test merging up and down at the same time
+		free(data[i]);
+	}
+
+	gettimeofday(&end, 0);
+	double elapsed = (double)(end.tv_usec - start.tv_usec)/1000000 + (double)(end.tv_sec - start.tv_sec);
+	return elapsed;
 }
 
 
@@ -139,7 +165,7 @@ int main()
 	double timeFive = 0;
 	double timeSix = 0;
 
-	int i;
+	int i;/*
 	for (i=0; i<100; ++i) {
 		timeOne = timeOne + firstWorkload();
 	}
@@ -151,15 +177,15 @@ int main()
 	}
 	for (i=0; i<100; ++i) {
 		timeFour = timeFour + fourthWorkload();
-	}/*
-	for (i=0; i<1; ++i) {
-		timeFive = timeFive + fifthWorkload();
 	}*/
+	for (i=0; i<5; ++i) {
+		timeFive = timeFive + fifthWorkload();
+	}
 	printf("\nAverage time taken for workload 1 is: %f", timeOne/100);
 	printf("\nAverage time taken for workload 2 is: %f", timeTwo/100);
 	printf("\nAverage time taken for workload 3 is: %f", timeThree/100);
         printf("\nAverage time taken for workload 4 is: %f", timeFour/100);
-        printf("\nAverage time taken for workload 5 is: %f", timeFive/100);
+        printf("\nAverage time taken for workload 5 is: %f", timeFive/5);
         printf("\nAverage time taken for workload 6 is: %f", timeSix/100);
 }
 
