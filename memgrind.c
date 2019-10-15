@@ -7,7 +7,7 @@
 #include "mymalloc.h"
 
 double firstWorkload(){
-	printf("WORKLOAD1\n");
+	printf("\nWORKLOAD1\n");
 
 	struct timeval start, end;
 	gettimeofday(&start, NULL);
@@ -27,7 +27,7 @@ double firstWorkload(){
 }				
 
 double secondWorkload(){
-	printf("WORKLOAD2\n");
+	printf("\nWORKLOAD2\n");
 
 	struct timeval start, end; 
 	gettimeofday(&start, 0);
@@ -52,7 +52,41 @@ double secondWorkload(){
 
 } 
 
-void thirdWorkload(){}
+void thirdWorkload(){
+	printf("\nWORKLOAD3\n");
+
+	struct timeval start, end;
+	int i = 0;
+	char* data[50];
+	int option;
+	/*while (i < 50) { //free until 50 bytes
+		option = rand() % 2;
+		if (option) {
+			data[i] = (char*)malloc(1);
+			++i;
+		} else if (i > 0) {
+			free(data[i-1]);
+			--i;
+		}
+	}*/
+	int nMalloc = 0;
+	while (nMalloc < 50) { //repeat until malloc 50 times
+		option = rand() % 2;
+		if (option) {
+			data[i] = (char*)malloc(1);
+			++i;
+			++nMalloc;
+		} else if (i > 0) {
+			free(data[i-1]);
+			--i;
+		}
+	}
+
+	while (i > 0) {
+		free(data[i-1]);
+		--i;
+	}
+}
 
 
 
@@ -68,6 +102,9 @@ int main()
 	}
 	for (i=0; i<1; ++i) {
 		timeTwo = timeTwo + secondWorkload();
+	}
+	for (i=0; i<1; ++i) {
+		timeThree = timeThree + thirdWorkload();
 	}
 	printf("\nAverage time taken for workload 1 is: %f", timeOne/100);
 	printf("\nAverage time taken for workload 2 is: %f", timeTwo/100);
