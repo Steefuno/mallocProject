@@ -120,7 +120,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 		}
 
 		//Change current to next node
-		printf("%x is unavailable with size %d, continuing to ", currentNode, currentNode->size);
+		//printf("%x is unavailable with size %d, continuing to ", currentNode, currentNode->size);
 		currentNode = (metadata*)((void*)currentNode + sizeof(metadata) + currentNode->size);
 		printf("%x\n", currentNode);
 
@@ -153,7 +153,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 
 void myfree(void* ptr, char* fileName, int line)
 {
-	printf("Attempting to free %x\n", ptr);
+	printf("\nAttempting to free %x\n", ptr);
 
 	//User is freeing a node before allocated space
 	if (ptr < (void*)node0 + sizeof(metadata) ) {
@@ -174,8 +174,7 @@ void myfree(void* ptr, char* fileName, int line)
 	metadata* currentNode = node0;
  	metadata* node1; 
 	metadata* node3; 
-
-	printf("YEE HAWW %d", currentNode->used);	
+	
 	//trying to free an unused node
 	if (currentNode->used == 0) {
 		printf("\terror: Cannot free unallocated space\n"
@@ -187,7 +186,11 @@ void myfree(void* ptr, char* fileName, int line)
 	while(1) {
 		printf("\tChecking node1 in %x\n", currentNode);
 
-		if (currentNode == node2) break; //If node0 is node2
+		if (currentNode == node2){
+			
+			 break; //If node0 is node2
+				}
+		
 
 		//checks if node2 is outside of the given memory
 		if ((void*)currentNode + sizeof(metadata) + currentNode->size >= (void*)myblock + 4096 ){
@@ -196,19 +199,24 @@ void myfree(void* ptr, char* fileName, int line)
 			return; 
 		}
 	
+
 		//if next node is node2, currentNode is node1
 		if ((void*)currentNode + sizeof(metadata) + currentNode->size == node2) {
 			node1 = currentNode;
+		
+
 			break;
 		}
 		
 		//passed the node2	
-		if ((void*)currentNode + sizeof(metadata) + currentNode-> size > node2) {
+
+		if ((void*)currentNode + sizeof(metadata) + currentNode-> size >(void*) node2) {
 			printf("\terror: Cannot free unallocated space\n"
 				"\tFile: %s, Line:%d" , fileName, line);	
 			return;
 		}
 	
+
 		//move onto the next node 
 		currentNode = (metadata*)((void*)currentNode + sizeof(metadata) + currentNode->size);
 	}

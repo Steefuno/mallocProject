@@ -7,59 +7,51 @@
 #include "mymalloc.h"
 
 
-long firstWorkload(){
+double firstWorkload(){
 
 	struct timeval start, end;
 
-	gettimeofday(&start, 0);
+	gettimeofday(&start, NULL);
 
 	int i;
-	int *arr[4096];
+	char * arr[4096];
 	
 		for(i = 0; i<150; i++)
 		{
-			arr[i] = (int *)malloc(1);
+			arr[i] =(char*)malloc(1);
 			free(arr[i]); 
 		}
 
+
 		gettimeofday(&end, 0);
 
-		long elapsed = (end.tv_sec - start.tv_sec)*1000000 + end.tv_usec - start.tv_usec;
+	double elapsed =(double) (end.tv_usec - start.tv_usec)/1000000 +(double) (end.tv_sec - start.tv_sec);
 
 	return elapsed; 
 		}				
 
-long secondWorkload(){
+double secondWorkload(){
 
 	struct timeval start, end; 
 
 	gettimeofday(&start, 0);
 
-	int i;
-	int j= 0;
-	void* arr[4096];
-		
-		for(i = 0; i<150; i++){
+	//implement second workload
 
-	
-			arr[j] = (void*)malloc(1);
-			if (j == 50)
-			{
 
-	//if 50 is reached, then start to free
-	j = -1;
-	int x;
-	for (x = 0; x < 50; x++){
-	free(arr[i]);}
-	
-	}
 
-	j++;
-} 
 
-gettimeofday(&end, 0);
 
-long elapsed = (end.tv_sec - start.tv_sec)*1000000 + end.tv_usec - start.tv_usec;
+
+
+
+
+
+
+
+	gettimeofday(&end, 0);
+
+double elapsed = (double)(end.tv_usec - start.tv_usec)/1000000 +(double)(end.tv_sec - start.tv_sec);
 
 return elapsed; 
 
@@ -70,14 +62,18 @@ void thirdWorkload(){}
 
 
 int main() {
-//perform all workloads
+	
+	double timeOne = 0;
+	double timeTwo = 0;
+	double timeThree = 0;
 
-//have to run all workloads 100 times and find the average times 
-
-//firstWorkload();
-//secondWorkload();
-
-
+	int i;
+	for (i=0; i<100; i++){
+		timeOne = timeOne + firstWorkload();
+		
+		}
+	printf("\nAverage time taken for workload 1 is: %f", timeOne/100);
+	printf("\nAverage time taken for workload 2 is: %f", timeTwo/100);
 
 }
 
