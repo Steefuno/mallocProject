@@ -157,15 +157,15 @@ void myfree(void* ptr, char* fileName, int line)
 
 	//User is freeing a node before allocated space
 	if (ptr < (void*)node0 + sizeof(metadata) ) {
-		printf("\terror: %x is not inside memory\n
-			\tFile: %s, Line:%d" , ptr, fileName, line);			
+		printf("\terror: %x is not inside memory\n"
+			"\tFile: %s, Line:%d" , ptr, fileName, line);			
 		return;
 	}
 		
 	//Node0 is NULL when malloc is not called yet
 	if (node0==NULL){ 
-		printf("\terror: No data allocated\n
-			\tFile: %s, Line:%d" , fileName, line);
+		printf("\terror: No data allocated\n"
+			"\tFile: %s, Line:%d" , fileName, line);
 		return;
 	} 
 
@@ -174,11 +174,12 @@ void myfree(void* ptr, char* fileName, int line)
 	metadata* currentNode = node0;
  	metadata* node1; 
 	metadata* node3; 
-	
+
+	printf("YEE HAWW %d", currentNode->used);	
 	//trying to free an unused node
 	if (currentNode->used == 0) {
-		printf("\terror: Cannot free unallocated space\n
-			\tFile: %s, Line:%d" , fileName, line);
+		printf("\terror: Cannot free unallocated space\n"
+			"\tFile: %s, Line:%d" , fileName, line);
 		return;
 	}
 
@@ -190,8 +191,8 @@ void myfree(void* ptr, char* fileName, int line)
 
 		//checks if node2 is outside of the given memory
 		if ((void*)currentNode + sizeof(metadata) + currentNode->size >= (void*)myblock + 4096 ){
-			printf("\terror: %x is not inside memory\n
-				\tFile: %s, Line:%d" , ptr, fileName, line);	
+			printf("\terror: %x is not inside memory\n"
+				"\tFile: %s, Line:%d" , ptr, fileName, line);	
 			return; 
 		}
 	
@@ -203,8 +204,8 @@ void myfree(void* ptr, char* fileName, int line)
 		
 		//passed the node2	
 		if ((void*)currentNode + sizeof(metadata) + currentNode-> size > node2) {
-			printf("\terror: Cannot free unallocated space\n
-				\tFile: %s, Line:%d" , fileName, line);	
+			printf("\terror: Cannot free unallocated space\n"
+				"\tFile: %s, Line:%d" , fileName, line);	
 			return;
 		}
 	
@@ -221,6 +222,7 @@ void myfree(void* ptr, char* fileName, int line)
 	if (node3 != NULL && node3->used == 0) {
 		printf("\t\tMerged node3 into node2\n");
 		node2->size = node2->size + sizeof(metadata) + node3->size;
+		node3->used=0;
 		//node3 = NULL; don't need to do this because the variable will disappear after function ends
 	}
 	
@@ -228,7 +230,11 @@ void myfree(void* ptr, char* fileName, int line)
 	if (node1 != NULL && node1->used == 0) {
 		printf("\t\tMerged node2 into node1\n");
 		node1->size = node1->size + sizeof(metadata) + node2->size;
+		node2->used =0;
 	}
-
+	
+	if ((node3==NULL || node3->used!= 0) && (node1==NULL || node1->used!=0)){
+		node2->used=0;
+	}
 	return;
 }
