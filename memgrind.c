@@ -158,7 +158,7 @@ double sixthWorkload()
 	for (i=0; i < 150; i = i + 1) {
 		data[i] = (char*)malloc(1);
 	}
-	for (i=0; i < 149; i = i + 1) {
+	for (i=148; i >= 0; i = i - 1) { //tests merging node3 into node2
 		free(data[i]);
 	}
 	free(data[149]); //tests freeing in bulk

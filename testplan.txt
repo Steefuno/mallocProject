@@ -1,0 +1,32 @@
+testplan.txt
+
+Rithvik Aleshetty
+	Setup initial mymalloc and free
+		General idea of when and how to loop, what conditions to check and what would happen where
+	Setup error handling
+	Setup workloads 1-2
+
+Steven Nguyen
+	Adjusted intial mymalloc and free
+		Fixed casting and pointer arithmetics
+	Setup error handling
+	Setup workloads 3-6
+
+
+Workload 5 (E)
+	Mallocs 1 byte 150 times
+	Frees 0, 4, 8, 12, ...
+		to test freeing without any merging
+	Frees 1, 5, 9, 13, ...
+		to test merging left when freeing
+	Frees    3, 7, 11, ...
+		to test merging right when freeing
+	Frees 2, 6,10, 14, ...
+		to test merging left and right in the same free()
+
+Workload 6 (F)
+	Mallocs 1 byte 150 times
+	Frees bytes 0 to 148 inclusive starting from 148
+		to test merging left from a node that is already merged left
+	Frees 149
+		to test merging left into a node that is already merged left
