@@ -40,25 +40,22 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 	if (node0 == NULL)
 	{	
 		//setup of metadata
-		printf("node0 is NULL, setting up\n");
 		node0 = (metadata*)myblock;
 		node0->used = 0;
 		node0->size = 4096 - sizeof(metadata);
-		printf("Data starts at %x and ends at %x\n", node0, (void*)node0 + 4096 - sizeof(metadata));
 	}
 
-	printf("Attempting to allocate %zu bytes\n", bytes);
 	if (bytes == 0) //allocating 0 bytes, return NULL
 	{
-		printf("\tReturning NULL, allocated 0 bytes\n"
-		"\tFile: %s, Line:%d" , fileName, line);
+		printf("error: value must be atleast 1\n"
+			"\tFile: %s, Line: %d", fileName, line);
 		return NULL; 	
 	}
 	//Allocating a value greater than max size also stops cases when size_t is smaller then casting
 	if (bytes > (size_t)(4096 - sizeof(metadata)))
 	{
-		printf("\tReturn NULL, no space\n"
-		"\tFile: %s, Line:%d" , fileName, line);
+		printf("error: value exceeds memory\n"
+			"\tFile: %s, Line: %d", fileName, line);
 		return NULL;
 	}
 	//Note: size_t is an unsigned decimal, cannot be negative
@@ -74,11 +71,6 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 			if (currentNode->used == 0) 
 			{
 				currentNode->used = (unsigned short)bytes;
-				
-				printf("\t%x is an empty node, allocating %d bytes\n",
-					(void*)currentNode + sizeof(metadata),
-					(unsigned short)bytes
-				);
 				return (void*)currentNode + sizeof(metadata);
 			}
 
@@ -93,12 +85,6 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 				((metadata*)newNode)->size = size;
 				((metadata*)newNode)->used = used;
 
-				printf("\t%x is used, but has enough space, so created new node at %x with %d\n",
-					currentNode,
-					newNode,
-					used
-				);
-
 				//Resize currnetNode to 
 				currentNode->size = currentNode->used;
 				return (void*)newNode + sizeof(metadata); //return pointer to data for newNode
@@ -109,17 +95,13 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 		//Next node cannot exist, no space
 		if ((void*)currentNode + currentNode->size > (void*)myblock + 4096 - (unsigned short)bytes - sizeof(metadata))
 		{
-			printf("\terror: Returning NULL, no more space\n"
-			"\tFile: %s, Line:%d" , fileName, line);
+			printf("\terror: no more space\n"
+				"\tFile: %s, Line: %d", fileName, line);
 			return NULL;
 		}
 
-		//Change current to next node
-		//printf("%x is unavailable with size %d, continuing to ", currentNode, currentNode->size);
+		//Continue to next node
 		currentNode = (metadata*)((void*)currentNode + sizeof(metadata) + currentNode->size);
-//		printf("%x\n", currentNode);
-
-		//continue to check next node
 	}
 
 	return NULL; //Never occurs, idk if we need to leave this here
@@ -148,19 +130,17 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 
 void myfree(void* ptr, char* fileName, int line)
 {
-	printf("\nAttempting to free %x\n", ptr);
-
 	//User is freeing a node before allocated space
 	if (ptr < (void*)node0 + sizeof(metadata) ) {
-		printf("\terror: %x is not inside memory\n"
-			"\tFile: %s, Line:%d" , ptr, fileName, line);			
+		printf("error: %x is not inside memory\n"
+			"\tFile: %s, Line: %d", ptr, fileName, line);			
 		return;
 	}
 		
 	//Node0 is NULL when malloc is not called yet
 	if (node0 == NULL){ 
-		printf("\terror: No data allocated\n"
-			"\tFile: %s, Line:%d" , fileName, line);
+		printf("error: No data allocated\n"
+			"\tFile: %s, Line: %d", fileName, line);
 		return;
 	} 
 
@@ -179,8 +159,8 @@ void myfree(void* ptr, char* fileName, int line)
 
 		//checks if node2 is outside of the given memory
 		if ((void*)currentNode + sizeof(metadata) + currentNode->size >= (void*)myblock + 4096 ){
-			printf("\terror: %x is not inside memory\n"
-				"\tFile: %s, Line:%d" , ptr, fileName, line);	
+			printf("error: %x is not inside memory\n"
+				"\tFile: %s, Line: %d", ptr, fileName, line);	
 			return; 
 		}
 	
@@ -193,8 +173,8 @@ void myfree(void* ptr, char* fileName, int line)
 		
 		//passed the node2	
 		if ((void*)currentNode + sizeof(metadata) + currentNode-> size >(void*) node2) {
-			printf("\terror: Cannot free unallocated space\n"
-				"\tFile: %s, Line:%d" , fileName, line);	
+			printf("error: Cannot free unallocated space\n"
+				"\tFile: %s, Line:%d", fileName, line);	
 			return;
 		}
 	
@@ -210,20 +190,17 @@ void myfree(void* ptr, char* fileName, int line)
 	
 	//if node3 is empty, merge into node2
 	if (node3 != NULL && node3->used == 0) {
-		printf("\t\tMerged node3 into node2\n");
 		node2->size = node2->size + sizeof(metadata) + node3->size;
 	}
 
 	//if node1 is empty, merge node2 into node1
 	if (node1 != NULL && node1->used == 0) {
-		printf("\t\tMerged node2 into node1 at %x\n", node1);
 		node1->size = node1->size + sizeof(metadata) + node2->size;
 	} else if (node2->used == 0) {
-		printf("\terror: Cannot free unallocatedd space\n"
-			"\tFile: %s, Line:%d" , fileName, line);
+		printf("error: Cannot free unallocatedd space\n"
+			"\tFile: %s, Line: %d", fileName, line);
 		return;
 	} else {
-		printf("\t\tFreed node2 at %x\n", node2);
 		node2->used=0;
 	}
 	return;

@@ -6,9 +6,8 @@
 #include <sys/time.h>
 #include "mymalloc.h"
 
-double firstWorkload(){
-	printf("\nWORKLOAD1\n");
-
+double firstWorkload()
+{
 	struct timeval start, end;
 	gettimeofday(&start, NULL);
 
@@ -25,9 +24,8 @@ double firstWorkload(){
 	return elapsed; 
 }				
 
-double secondWorkload(){
-	printf("\nWORKLOAD2\n");
-
+double secondWorkload()
+{
 	struct timeval start, end; 
 	gettimeofday(&start, 0);
 
@@ -50,9 +48,8 @@ double secondWorkload(){
 
 } 
 
-double thirdWorkload(){
-	printf("\nWORKLOAD3\n");
-
+double thirdWorkload()
+{
 	struct timeval start, end;
 	gettimeofday(&start, 0);
 
@@ -85,8 +82,6 @@ double thirdWorkload(){
 
 double fourthWorkload()
 {
-	printf("\nWORKLOAD4\n");
-
 	struct timeval start, end;
 	gettimeofday(&start, 0);
 
@@ -127,8 +122,6 @@ double fourthWorkload()
 
 double fifthWorkload()
 {
-	printf("\nWORKLOAD5\n");
-	
 	struct timeval start, end;
 	gettimeofday(&start, 0);
 
@@ -155,6 +148,26 @@ double fifthWorkload()
 	return elapsed;
 }
 
+double sixthWorkload()
+{
+	struct timeval start, end;
+	gettimeofday(&start, 0);
+
+	int i;
+	char* data[150];
+	for (i=0; i < 150; i = i + 1) {
+		data[i] = (char*)malloc(1);
+	}
+	for (i=0; i < 149; i = i + 1) {
+		free(data[i]);
+	}
+	free(data[149]); //tests freeing in bulk
+
+	gettimeofday(&end, 0);
+	double elapsed = (double)(end.tv_usec - start.tv_usec)/1000000 + (double)(end.tv_sec - start.tv_sec);
+	return elapsed;
+}
+
 
 int main()
 {	
@@ -165,7 +178,7 @@ int main()
 	double timeFive = 0;
 	double timeSix = 0;
 
-	int i;/*
+	int i;
 	for (i=0; i<100; ++i) {
 		timeOne = timeOne + firstWorkload();
 	}
@@ -177,15 +190,18 @@ int main()
 	}
 	for (i=0; i<100; ++i) {
 		timeFour = timeFour + fourthWorkload();
-	}*/
-	for (i=0; i<5; ++i) {
+	}
+	for (i=0; i<100; ++i) {
 		timeFive = timeFive + fifthWorkload();
+	}
+	for (i=0; i<100; ++i) {
+		timeSix = timeSix + sixthWorkload();
 	}
 	printf("\nAverage time taken for workload 1 is: %f", timeOne/100);
 	printf("\nAverage time taken for workload 2 is: %f", timeTwo/100);
 	printf("\nAverage time taken for workload 3 is: %f", timeThree/100);
         printf("\nAverage time taken for workload 4 is: %f", timeFour/100);
-        printf("\nAverage time taken for workload 5 is: %f", timeFive/5);
+        printf("\nAverage time taken for workload 5 is: %f", timeFive/100);
         printf("\nAverage time taken for workload 6 is: %f", timeSix/100);
 }
 
