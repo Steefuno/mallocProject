@@ -47,7 +47,7 @@ void* mymalloc(size_t bytes, char* fileName, int line)
 
 	if (bytes == 0) //allocating 0 bytes, return NULL
 	{
-		printf("error: value must be atleast 1\n"
+		printf("error: value must be at least 1\n"
 			"\tFile: %s, Line: %d", fileName, line);
 		return NULL; 	
 	}
@@ -197,7 +197,7 @@ void myfree(void* ptr, char* fileName, int line)
 	if (node1 != NULL && node1->used == 0) {
 		node1->size = node1->size + sizeof(metadata) + node2->size;
 	} else if (node2->used == 0) {
-		printf("error: Cannot free unallocatedd space\n"
+		printf("error: Cannot free unallocated space\n"
 			"\tFile: %s, Line: %d", fileName, line);
 		return;
 	} else {
